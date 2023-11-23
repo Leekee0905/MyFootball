@@ -1,9 +1,7 @@
-import { BASE_URL } from '../../api/const';
 import { useRouter } from '../../hooks/useRouter';
 import { Button, Typography, useTheme } from '@mui/material';
 const Home = () => {
-  const { routeTo } = useRouter();
-  console.log(BASE_URL);
+  const { routeTo } = useRouter();  
   const theme = useTheme();
   return (
     <>
