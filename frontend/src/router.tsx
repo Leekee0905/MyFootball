@@ -1,8 +1,11 @@
 import { createBrowserRouter } from 'react-router-dom';
 import { Router as RemixRouter } from '@remix-run/router/dist/router';
-import Home from './pages/Home/Home';
+import Home from './pages/home/Home';
 import Layout from './layouts/Layout';
-import Login from './pages/Login/Login';
+import Login from './pages/login/Login';
+import FreeBoard from './pages/freeboard/FreeBoard';
+import Schedule from './pages/schedule/Schedule';
+import Table from './pages/table/Table';
 
 interface RouterElement {
   id: number;
@@ -27,6 +30,27 @@ const routerData: RouterElement[] = [
     element: <Login />,
     withAuth: false,
   },
+  {
+    id:2,
+    path: '/freeBoard',
+    label: 'FreeBoard',
+    element: <FreeBoard/>,
+    withAuth: false
+  },
+  {
+    id: 3,
+    path: '/schedule',
+    label: 'Schedule',
+    element: <Schedule/>,
+    withAuth: false,
+  },
+  {
+    id: 4,
+    path: '/table',
+    label: 'Table',
+    element: <Table/>,
+    withAuth: false
+  }
 ];
 
 export const routers: RemixRouter = createBrowserRouter(
