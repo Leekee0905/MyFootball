@@ -31,26 +31,26 @@ const routerData: RouterElement[] = [
     withAuth: false,
   },
   {
-    id:2,
+    id: 2,
     path: '/freeBoard',
     label: 'FreeBoard',
-    element: <FreeBoard/>,
-    withAuth: false
+    element: <FreeBoard />,
+    withAuth: false,
   },
   {
     id: 3,
     path: '/schedule',
     label: 'Schedule',
-    element: <Schedule/>,
+    element: <Schedule />,
     withAuth: false,
   },
   {
     id: 4,
     path: '/table',
     label: 'Table',
-    element: <Table/>,
-    withAuth: false
-  }
+    element: <Table />,
+    withAuth: false,
+  },
 ];
 
 export const routers: RemixRouter = createBrowserRouter(
