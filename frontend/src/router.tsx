@@ -6,6 +6,7 @@ import Login from './pages/login/Login';
 import FreeBoard from './pages/freeboard/FreeBoard';
 import Schedule from './pages/schedule/Schedule';
 import Table from './pages/table/Table';
+import Signup from './pages/signup/Signup';
 
 interface RouterElement {
   id: number;
@@ -49,6 +50,13 @@ const routerData: RouterElement[] = [
     path: '/table',
     label: 'Table',
     element: <Table />,
+    withAuth: false,
+  },
+  {
+    id: 5,
+    path: '/signup',
+    label: 'Signup',
+    element: <Signup />,
     withAuth: false,
   },
 ];
