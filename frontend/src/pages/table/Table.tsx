@@ -1,4 +1,4 @@
-import FootballTable from '../../components/FootballTable';
+import FootballTable from '../../components/LeagueTable/FootballTable';
 const tableHeader: Array<string> = [
   '순위',
   '',
@@ -11,6 +11,7 @@ const tableHeader: Array<string> = [
   '실점',
   '득실차',
   '승점',
+  '최근 5경기',
 ];
 const Table = () => {
   return <FootballTable isHome={false} tableHeader={tableHeader} />;
