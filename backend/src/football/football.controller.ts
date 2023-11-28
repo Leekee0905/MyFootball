@@ -1,4 +1,4 @@
-import { Controller, Get, Param } from '@nestjs/common';
+import { Controller, Get, Param, Query } from '@nestjs/common';
 import { FootballService } from './football.service';
 
 @Controller('football')
@@ -8,7 +8,8 @@ export class FootballController {
   @Get(':leagueName/standings')
   async getStandingsByLeague(
     @Param('leagueName') leagueName: string,
+    @Query('season') season: string,
   ): Promise<any> {
-    return this.footballService.getStandingsByLeague(leagueName);
+    return this.footballService.getStandingsByLeague(leagueName, season);
   }
 }
