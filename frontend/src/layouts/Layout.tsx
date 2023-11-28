@@ -21,7 +21,7 @@ const Layout = ({ children }: { children: ReactNode }) => {
       style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}
     >
       <Header userProfile={userProfile} />
-      <main style={{ flex: 1 }}>{children}</main>
+      <main style={{ flex: 1, flexShrink: 0 }}>{children}</main>
       <Footer />
     </div>
   );

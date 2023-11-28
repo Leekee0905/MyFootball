@@ -141,6 +141,17 @@ const Header = ({ userProfile }: { userProfile: User | null }) => {
           <Box>
             <Button
               onClick={() => {
+                routeTo('/signup');
+              }}
+              sx={{
+                font: theme.typography.fontFamily,
+                color: theme.palette.secondary.main,
+              }}
+            >
+              회원가입
+            </Button>
+            <Button
+              onClick={() => {
                 routeTo('/login');
               }}
               sx={{
