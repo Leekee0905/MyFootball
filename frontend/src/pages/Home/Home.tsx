@@ -1,5 +1,5 @@
 import { Grid } from '@mui/material';
-import HomeTable from '../../components/FootballTable';
+import HomeTable from '../../components/LeagueTable/FootballTable';
 const tableHeader: Array<string> = [
   '순위',
   '',
