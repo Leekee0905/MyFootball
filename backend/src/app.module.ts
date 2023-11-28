@@ -5,5 +5,7 @@ import { FootballModule } from './football/football.module';
 
 @Module({
   imports: [FootballModule],
+  controllers: [],
+  providers: [],
 })
 export class AppModule {}

@@ -1,13 +1,14 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, Param } from '@nestjs/common';
 import { FootballService } from './football.service';
-import { Observable } from 'rxjs';
 
 @Controller('football')
 export class FootballController {
   constructor(private readonly footballService: FootballService) {}
 
-  @Get('epl-standings')
-  getEplStandings(): Observable<any> {
-    return this.footballService.getEplStandings();
+  @Get(':leagueName/standings')
+  async getStandingsByLeague(
+    @Param('leagueName') leagueName: string,
+  ): Promise<any> {
+    return this.footballService.getStandingsByLeague(leagueName);
   }
 }
