@@ -43,6 +43,7 @@ interface StandingDataType {
 interface TableProps {
   tableHeader: Array<string>;
   isHome: boolean;
+  season: string;
 }
 
 const initialStandingTableData: StandingDataType[] = [
@@ -79,7 +80,7 @@ const resultColor: { [result: string]: string } = {
   D: '#c3b3c5',
 };
 
-const FootballTable = ({ tableHeader, isHome }: TableProps) => {
+const FootballTable = ({ tableHeader, isHome, season }: TableProps) => {
   const theme = useTheme();
   const isSmallScreen = useMediaQuery(theme.breakpoints.down('md'));
   const isXlScreen = useMediaQuery(theme.breakpoints.up('xl'));
@@ -88,11 +89,10 @@ const FootballTable = ({ tableHeader, isHome }: TableProps) => {
     initialStandingTableData,
   );
   const [emblem, setEmblem] = useState<string>('');
-  const [season, setSeason] = useState<string>('2023');
   const [currentTableLeagueName, setCurrentTableLeagueName] =
     useState<string>('PL');
-  const { data, isLoading, isSuccess } = useQuery({
-    queryKey: ['table', currentTableLeagueName],
+  const { data, isLoading, isSuccess, refetch } = useQuery({
+    queryKey: ['table', currentTableLeagueName, season],
     queryFn: () =>
       apiInstance.get(`/football/${currentTableLeagueName}/standings`, {
         params: {
@@ -115,9 +115,22 @@ const FootballTable = ({ tableHeader, isHome }: TableProps) => {
         sx={{
           borderRadius: '100%',
           backgroundColor: resultColor[result],
+          width: '30px',
+          height: '30px',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          margin: '12px',
+          overflow: 'hidden',
         }}
       >
-        <Typography sx={{ color: theme.palette.secondary.main }}>
+        <Typography
+          sx={{
+            color: theme.palette.secondary.main,
+            textAlign: 'center',
+            lineHeight: '1',
+          }}
+        >
           {result}
         </Typography>
       </Box>
@@ -140,6 +153,7 @@ const FootballTable = ({ tableHeader, isHome }: TableProps) => {
   };
 
   useEffect(() => {
+    console.log(season);
     if (isSuccess) {
       console.log(data.data);
       preLoadImage(data.data.emblem);
@@ -151,6 +165,13 @@ const FootballTable = ({ tableHeader, isHome }: TableProps) => {
         : setStandingsData(extractingTeamNames(data.data.standings));
     }
   }, [data]);
+
+  useEffect(() => {
+    refetch();
+    if (isLoading) {
+      console.log('nowloading');
+    }
+  }, [season]);
 
   const renderLeagueButtons = () => {
     return Object.keys(league).map((leagueName, idx) => {
@@ -199,8 +220,19 @@ const FootballTable = ({ tableHeader, isHome }: TableProps) => {
               paddingLeft: '12px',
               fontWeight: 'bold',
               color: theme.palette.primary.main,
+              alignItems: 'center',
+              display: 'flex',
             }}
           >
+            <Typography
+              sx={{
+                fontWeight: 'inherit',
+                fontSize: 'inherit',
+                marginRight: '12px',
+              }}
+            >
+              {isHome ? null : `${season} - ${season + 1}`}시즌
+            </Typography>
             해외축구 순위표
           </Typography>
           {isHome ? (
@@ -226,24 +258,32 @@ const FootballTable = ({ tableHeader, isHome }: TableProps) => {
         {isHome ? null : (
           <>
             <Divider />
-            <Box sx={{ textAlign: 'center' }}>
+            <Box sx={{ textAlign: 'center', padding: '1px' }}>
               <img src={emblem} />
             </Box>
           </>
         )}
         <Divider />
-        <TableContainer className="home_table_container">
+        <TableContainer className="home_table_container" sx={{ width: '100%' }}>
           <Table
             aria-label="home-table"
             size={isHome ? 'small' : 'medium'}
-            style={{ tableLayout: 'fixed' }}
+            sx={{ width: '100%' }}
           >
-            <TableHead>
+            <TableHead sx={{ backgroundColor: '#fbfafa' }}>
               <TableRow>
-                {tableHeader.map((e, idx) => {
+                {tableHeader.map((headerName, idx) => {
                   return (
-                    <TableCell sx={{ textAlign: 'center' }} key={idx}>
-                      {e}
+                    <TableCell
+                      sx={{
+                        textAlign: 'center',
+                        padding: '1px',
+                        fontWeight: 'bold',
+                        color: theme.palette.primary.main,
+                      }}
+                      key={idx}
+                    >
+                      {headerName}
                     </TableCell>
                   );
                 })}
@@ -268,8 +308,8 @@ const FootballTable = ({ tableHeader, isHome }: TableProps) => {
                       >
                         {e.position}
                       </TableCell>
-                      <TableCell>
-                        <Box sx={{ textAlign: 'center' }}>
+                      <TableCell sx={{ width: isHome ? '48px' : '76px' }}>
+                        <Box sx={{ textAlign: 'center', padding: '1px' }}>
                           <img
                             src={e.crest}
                             style={{ maxWidth: '64px', maxHeight: '100%' }}
@@ -284,6 +324,8 @@ const FootballTable = ({ tableHeader, isHome }: TableProps) => {
                       <TableCell
                         sx={{
                           textAlign: 'center',
+                          maxWidth: isHome ? '100px' : '200px',
+                          width: isHome ? null : '200px',
                         }}
                       >
                         <Typography
@@ -295,32 +337,38 @@ const FootballTable = ({ tableHeader, isHome }: TableProps) => {
                           {isHome ? e.tla : e.shortName}
                         </Typography>
                       </TableCell>
-                      <TableCell sx={{ textAlign: 'center' }}>
+                      <TableCell sx={{ textAlign: 'center', padding: '1px' }}>
                         {e.playedGames}
                       </TableCell>
-                      <TableCell sx={{ textAlign: 'center' }}>
+                      <TableCell sx={{ textAlign: 'center', padding: '1px' }}>
                         {e.won}
                       </TableCell>
-                      <TableCell sx={{ textAlign: 'center' }}>
+                      <TableCell sx={{ textAlign: 'center', padding: '1px' }}>
                         {e.draw}
                       </TableCell>
-                      <TableCell sx={{ textAlign: 'center' }}>
+                      <TableCell sx={{ textAlign: 'center', padding: '1px' }}>
                         {e.lost}
                       </TableCell>
                       {!isHome ? (
                         <>
-                          <TableCell sx={{ textAlign: 'center' }}>
+                          <TableCell
+                            sx={{ textAlign: 'center', padding: '1px' }}
+                          >
                             {e.goalsFor}
                           </TableCell>
-                          <TableCell sx={{ textAlign: 'center' }}>
+                          <TableCell
+                            sx={{ textAlign: 'center', padding: '1px' }}
+                          >
                             {e.goalsAgainst}
                           </TableCell>
-                          <TableCell sx={{ textAlign: 'center' }}>
+                          <TableCell
+                            sx={{ textAlign: 'center', padding: '1px' }}
+                          >
                             {e.goalDifference}
                           </TableCell>
                         </>
                       ) : null}
-                      <TableCell sx={{ textAlign: 'center' }}>
+                      <TableCell sx={{ textAlign: 'center', padding: '1px' }}>
                         <Typography
                           sx={{
                             color: theme.palette.primary.main,
@@ -331,8 +379,21 @@ const FootballTable = ({ tableHeader, isHome }: TableProps) => {
                         </Typography>
                       </TableCell>
                       {!isHome ? (
-                        <TableCell sx={{ textAlign: 'center' }}>
-                          <Box sx={{ display: 'flex', textAlign: 'center' }}>
+                        <TableCell
+                          sx={{
+                            textAlign: 'center',
+                            padding: '1px',
+                            maxWidth: '300px',
+                            width: '300px',
+                          }}
+                        >
+                          <Box
+                            sx={{
+                              display: 'flex',
+                              textAlign: 'center',
+                              justifyContent: 'center',
+                            }}
+                          >
                             {e.form
                               .split(',')
                               .map((e, idx) =>
