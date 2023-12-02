@@ -21,6 +21,7 @@ import {
 import { useRouter } from '../../hooks/useRouter';
 import LoadingCircular from '../LoadingCircular';
 import LeagueButton from './LeagueButton';
+import SeasonButton from './SeasonButton';
 
 interface StandingDataType {
   crest: string;
@@ -43,7 +44,6 @@ interface StandingDataType {
 interface TableProps {
   tableHeader: Array<string>;
   isHome: boolean;
-  season: string;
 }
 
 const initialStandingTableData: StandingDataType[] = [
@@ -80,7 +80,9 @@ const resultColor: { [result: string]: string } = {
   D: '#c3b3c5',
 };
 
-const FootballTable = ({ tableHeader, isHome, season }: TableProps) => {
+const year = new Date().getFullYear();
+
+const FootballTable = ({ tableHeader, isHome }: TableProps) => {
   const theme = useTheme();
   const isSmallScreen = useMediaQuery(theme.breakpoints.down('md'));
   const isXlScreen = useMediaQuery(theme.breakpoints.up('xl'));
@@ -89,6 +91,9 @@ const FootballTable = ({ tableHeader, isHome, season }: TableProps) => {
     initialStandingTableData,
   );
   const [emblem, setEmblem] = useState<string>('');
+
+  const [season, setSeason] = useState<string>(year.toString());
+
   const [currentTableLeagueName, setCurrentTableLeagueName] =
     useState<string>('PL');
   const { data, isLoading, isSuccess, refetch } = useQuery({
@@ -153,7 +158,6 @@ const FootballTable = ({ tableHeader, isHome, season }: TableProps) => {
   };
 
   useEffect(() => {
-    console.log(season);
     if (isSuccess) {
       console.log(data.data);
       preLoadImage(data.data.emblem);
@@ -195,7 +199,6 @@ const FootballTable = ({ tableHeader, isHome, season }: TableProps) => {
         marginY: '32px',
         maxWidth: '2560px',
         width: isXlScreen && !isHome ? '1440px' : null,
-        minWidth: isXlScreen && !isHome ? '1440px' : null,
       }}
     >
       <Paper
@@ -231,7 +234,7 @@ const FootballTable = ({ tableHeader, isHome, season }: TableProps) => {
                 marginRight: '12px',
               }}
             >
-              {isHome ? null : `${season} - ${season + 1}`}시즌
+              {isHome ? null : `${season} - ${Number(season) + 1}시즌`}
             </Typography>
             해외축구 순위표
           </Typography>
@@ -240,6 +243,7 @@ const FootballTable = ({ tableHeader, isHome, season }: TableProps) => {
               <Typography sx={{ fontWeight: 'bold' }}>더보기 {'>'}</Typography>
             </Button>
           ) : null}
+          {isHome ? null : <SeasonButton year={year} setSeason={setSeason} />}
         </Box>
 
         <Divider />
@@ -255,11 +259,22 @@ const FootballTable = ({ tableHeader, isHome, season }: TableProps) => {
             ? renderLeagueButtons().slice(0, 2)
             : renderLeagueButtons()}
         </Box>
-        {isHome ? null : (
+        {isHome ? null : isLoading ? (
+          <Box
+            sx={{
+              height: '200px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            <LoadingCircular />
+          </Box>
+        ) : (
           <>
             <Divider />
             <Box sx={{ textAlign: 'center', padding: '1px' }}>
-              <img src={emblem} />
+              <img src={emblem} alt="Emblem" />
             </Box>
           </>
         )}
@@ -334,7 +349,7 @@ const FootballTable = ({ tableHeader, isHome, season }: TableProps) => {
                             fontWeight: 'bold',
                           }}
                         >
-                          {isHome ? e.tla : e.shortName}
+                          {isHome ? e.tla : e.name}
                         </Typography>
                       </TableCell>
                       <TableCell sx={{ textAlign: 'center', padding: '1px' }}>
