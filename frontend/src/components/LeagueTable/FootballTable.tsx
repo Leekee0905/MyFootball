@@ -20,9 +20,8 @@ import {
 } from '@mui/material';
 import { useRouter } from '../../hooks/useRouter';
 import LoadingCircular from '../LoadingCircular';
-import LeagueButton from './LeagueButton';
 import SeasonButton from './SeasonButton';
-
+import { league, renderLeagueButtons } from '../RenderLeagueButton';
 interface StandingDataType {
   crest: string;
   draw: number;
@@ -65,14 +64,6 @@ const initialStandingTableData: StandingDataType[] = [
     won: 0,
   },
 ];
-
-const league: { [league: string]: string } = {
-  프리미어리그: 'PL',
-  분데스리가: 'BL1',
-  라리가: 'PD',
-  세리에: 'SA',
-  리그앙: 'FL1',
-};
 
 const resultColor: { [result: string]: string } = {
   W: '#00db74',
@@ -177,22 +168,6 @@ const FootballTable = ({ tableHeader, isHome }: TableProps) => {
     }
   }, [season]);
 
-  const renderLeagueButtons = () => {
-    return Object.keys(league).map((leagueName, idx) => {
-      const isLeagueActive = league[leagueName] === currentTableLeagueName;
-
-      return (
-        <LeagueButton
-          key={idx}
-          onClick={handleTableHeaderLeaugeClick}
-          isActive={isLeagueActive}
-          label={leagueName}
-          isHome={isHome}
-        />
-      );
-    });
-  };
-
   return (
     <Container
       sx={{
@@ -256,8 +231,16 @@ const FootballTable = ({ tableHeader, isHome }: TableProps) => {
           }}
         >
           {isSmallScreen
-            ? renderLeagueButtons().slice(0, 2)
-            : renderLeagueButtons()}
+            ? renderLeagueButtons({
+                isHome,
+                currentTableLeagueName,
+                onClick: handleTableHeaderLeaugeClick,
+              }).slice(0, 2)
+            : renderLeagueButtons({
+                isHome,
+                currentTableLeagueName,
+                onClick: handleTableHeaderLeaugeClick,
+              })}
         </Box>
         {isHome ? null : isLoading ? (
           <Box
