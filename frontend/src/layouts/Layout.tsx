@@ -12,7 +12,6 @@ const Layout = ({ children }: { children: ReactNode }) => {
   }, []);
 
   useEffect(() => {
-    console.log('page changed');
     fetchUserProfile();
   }, [children]);
 
@@ -21,6 +20,7 @@ const Layout = ({ children }: { children: ReactNode }) => {
       style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}
     >
       <Header userProfile={userProfile} />
+
       <main style={{ flex: 1, flexShrink: 0 }}>{children}</main>
       <Footer />
     </div>
