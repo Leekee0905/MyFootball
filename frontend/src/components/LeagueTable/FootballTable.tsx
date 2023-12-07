@@ -70,8 +70,11 @@ const resultColor: { [result: string]: string } = {
   L: '#e0005e',
   D: '#c3b3c5',
 };
-
-const year = new Date().getFullYear();
+const currentDate = new Date();
+const year =
+  currentDate.getMonth() < 7
+    ? currentDate.getFullYear() - 1
+    : currentDate.getFullYear();
 
 const FootballTable = ({ tableHeader, isHome }: TableProps) => {
   const theme = useTheme();
@@ -90,7 +93,7 @@ const FootballTable = ({ tableHeader, isHome }: TableProps) => {
   const { data, isLoading, isSuccess, refetch } = useQuery({
     queryKey: ['table', currentTableLeagueName, season],
     queryFn: () =>
-      apiInstance.get(`/football/${currentTableLeagueName}/standings`, {
+      apiInstance.get(`/table/${currentTableLeagueName}/standings`, {
         params: {
           season: season,
         },
