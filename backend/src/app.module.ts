@@ -1,10 +1,11 @@
 // app.module.ts
 
 import { Module } from '@nestjs/common';
-import { FootballModule } from './football/football.module';
+import { TableModule } from './table/table.module';
+import { ScheduleModule } from './schedule/schedule.module';
 
 @Module({
-  imports: [FootballModule],
+  imports: [TableModule, ScheduleModule],
   controllers: [],
   providers: [],
 })
