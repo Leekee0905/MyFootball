@@ -1,4 +1,4 @@
-import { Box, Typography } from '@mui/material';
+import { Box } from '@mui/material';
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -7,7 +7,6 @@ interface TabPanelProps {
 
 const CustomScheduleTabPanel = (props: TabPanelProps) => {
   const { children, value, ...other } = props;
-  console.log(value);
   return (
     <div
       role="tabpanel"
@@ -15,9 +14,7 @@ const CustomScheduleTabPanel = (props: TabPanelProps) => {
       aria-labelledby={`simple-tab-${value}`}
       {...other}
     >
-      <Box sx={{ p: 3 }}>
-        <Typography>{children}</Typography>
-      </Box>
+      <Box sx={{ p: 3 }}>{children}</Box>
     </div>
   );
 };
