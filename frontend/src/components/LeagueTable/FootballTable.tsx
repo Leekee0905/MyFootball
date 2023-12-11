@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import apiInstance from '../../api/apiInstance';
 import { useQuery } from '@tanstack/react-query';
 import { SeasonTable } from '../../types/table';
@@ -76,7 +76,7 @@ const year =
     ? currentDate.getFullYear() - 1
     : currentDate.getFullYear();
 
-const FootballTable = ({ tableHeader, isHome }: TableProps) => {
+const FootballTable = React.memo(({ tableHeader, isHome }: TableProps) => {
   const theme = useTheme();
   const isSmallScreen = useMediaQuery(theme.breakpoints.down('md'));
   const isXlScreen = useMediaQuery(theme.breakpoints.up('xl'));
@@ -107,34 +107,37 @@ const FootballTable = ({ tableHeader, isHome }: TableProps) => {
     img.src = url;
   };
 
-  const winDrawLoseColorConverter = (result: string, key: number) => {
-    return (
-      <Box
-        key={key}
-        sx={{
-          borderRadius: '100%',
-          backgroundColor: resultColor[result],
-          width: '30px',
-          height: '30px',
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          margin: '12px',
-          overflow: 'hidden',
-        }}
-      >
-        <Typography
+  const winDrawLoseColorConverter = useMemo(
+    () => (result: string, key: number) => {
+      return (
+        <Box
+          key={key}
           sx={{
-            color: theme.palette.secondary.main,
-            textAlign: 'center',
-            lineHeight: '1',
+            borderRadius: '100%',
+            backgroundColor: resultColor[result],
+            width: '30px',
+            height: '30px',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            margin: '12px',
+            overflow: 'hidden',
           }}
         >
-          {result}
-        </Typography>
-      </Box>
-    );
-  };
+          <Typography
+            sx={{
+              color: theme.palette.secondary.main,
+              textAlign: 'center',
+              lineHeight: '1',
+            }}
+          >
+            {result}
+          </Typography>
+        </Box>
+      );
+    },
+    [resultColor, theme.palette.secondary.main],
+  );
 
   const extractingTeamNames = (data: SeasonTable[]): StandingDataType[] => {
     const teamData = data.map((e: SeasonTable): StandingDataType => {
@@ -146,14 +149,13 @@ const FootballTable = ({ tableHeader, isHome }: TableProps) => {
     return teamData;
   };
 
-  const handleTableHeaderLeaugeClick = (leagueName: string) => {
+  const handleTableHeaderLeaugeClick = useCallback((leagueName: string) => {
     const currentLeague = league[leagueName];
     setCurrentTableLeagueName(currentLeague);
-  };
+  }, []);
 
   useEffect(() => {
     if (isSuccess) {
-      console.log(data.data);
       preLoadImage(data.data.emblem);
       setEmblem(data.data.emblem);
       isHome
@@ -166,9 +168,6 @@ const FootballTable = ({ tableHeader, isHome }: TableProps) => {
 
   useEffect(() => {
     refetch();
-    if (isLoading) {
-      console.log('nowloading');
-    }
   }, [season]);
 
   return (
@@ -422,6 +421,6 @@ const FootballTable = ({ tableHeader, isHome }: TableProps) => {
       </Paper>
     </Container>
   );
-};
+});
 
 export default FootballTable;
