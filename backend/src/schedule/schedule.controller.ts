@@ -27,13 +27,20 @@ export class ScheduleController {
     return this.scheduleService.getTeamsByLeague(leagueName, season);
   }
 
-  @Get('teams/:id/matches')
+  @Get(':id/teams/matches')
   async getMatchesByTeam(
     @Param('id') id: number,
     @Query('season') season: string,
     @Query('dateFrom') dateFrom: string,
     @Query('dateTo') dateTo: string,
+    @Query('competitions') competitions: number,
   ): Promise<any> {
-    return this.scheduleService.getMatchesByTeam(id, season, dateFrom, dateTo);
+    return this.scheduleService.getMatchesByTeam(
+      id,
+      season,
+      dateFrom,
+      dateTo,
+      competitions,
+    );
   }
 }

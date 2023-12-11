@@ -54,7 +54,7 @@ export class ScheduleService {
   private readonly apiUrl = 'https://api.football-data.org/v4/competitions';
   private readonly teamMatchUrl = 'https://api.football-data.org/v4/teams';
   private readonly apiKey = process.env.FOOTBALL_API_KEY;
-
+  private newMonthObject: Record<string, any[]> = {};
   private extractMatchFields(match: MatchData): any {
     const {
       id,
@@ -87,18 +87,40 @@ export class ScheduleService {
     };
   }
 
-  private groupMatchesByDate(matches: MatchData[]): Record<string, any[]> {
+  private groupMatchesByDate(
+    matches: MatchData[],
+    dateTo: string,
+  ): Record<string, any[]> {
     const groupedMatches: Record<string, any[]> = {};
+    const month = Number(dateTo.split('-')[1]);
 
     matches.forEach((match) => {
-      const dateKey = match.utcDate.slice(0, 10);
+      let dateKey = new Date(match.utcDate)
+        .toLocaleDateString()
+        .slice(5, 12)
+        .split('')
+        .map((e) => e.trim())
+        .join('');
 
+      if (dateKey.at(-1) === '.') {
+        dateKey = dateKey.slice(0, -1);
+      }
       if (!groupedMatches[dateKey]) {
         groupedMatches[dateKey] = [];
       }
-
       groupedMatches[dateKey].push(this.extractMatchFields(match));
+      // if (Number(dateKey.split('.')[0]) === month) {
+      //   if (!groupedMatches[dateKey]) {
+      //     groupedMatches[dateKey] = [];
+      //   }
+
+      // } else {
+      //   this.newMonthObject = {
+      //     [dateKey]: [this.extractMatchFields(match)],
+      //   };
+      // }
     });
+    //나중에 데이터베이스 연동 후에 전체일정 저장후 로컬라이징후 다시 가져오기
 
     return groupedMatches;
   }
@@ -123,7 +145,7 @@ export class ScheduleService {
 
       const matchesData: MatchData[] = response.data.matches;
 
-      const groupedData = this.groupMatchesByDate(matchesData);
+      const groupedData = this.groupMatchesByDate(matchesData, dateTo);
 
       return groupedData;
     } catch (error) {
@@ -169,6 +191,7 @@ export class ScheduleService {
     season: string,
     dateFrom: string,
     dateTo: string,
+    competitions: number,
   ): Promise<any> {
     const headers = {
       'X-Auth-Token': this.apiKey,
@@ -179,10 +202,18 @@ export class ScheduleService {
     try {
       const response = await axios.get(url, {
         headers,
-        params: { season: season, dateFrom: dateFrom, dateTo: dateTo },
+        params: {
+          season: season,
+          dateFrom: dateFrom,
+          dateTo: dateTo,
+          competitions: competitions,
+        },
       });
+      const matchesData: MatchData[] = response.data.matches;
 
-      return response;
+      const groupedData = this.groupMatchesByDate(matchesData, dateTo);
+
+      return groupedData;
     } catch (error) {
       throw error;
     }
