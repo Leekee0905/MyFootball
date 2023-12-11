@@ -22,9 +22,14 @@ const Home = () => {
         <Grid item xs={6} sm={6} md={6} lg={4} className="home_table_grid">
           <FootballTable tableHeader={tableHeader} isHome={true} />
         </Grid>
-        <Grid item xs={6} sm={6} md={6} lg={8}>
-          test
-        </Grid>
+        <Grid
+          item
+          xs={6}
+          sm={6}
+          md={6}
+          lg={8}
+          sx={{ overflowY: 'auto' }}
+        ></Grid>
       </Grid>
     </>
   );

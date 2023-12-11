@@ -7,7 +7,7 @@ interface SeasonButtonsProps {
 
 const SeasonButton = ({ year, setSeason }: SeasonButtonsProps) => {
   const seasonList = Array.from(
-    { length: year - 2019 },
+    { length: year - 2020 },
     (_, index) => year - index,
   );
 
