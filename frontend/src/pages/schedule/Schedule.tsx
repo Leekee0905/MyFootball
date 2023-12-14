@@ -1,10 +1,13 @@
 import {
   Box,
+  Button,
   Container,
+  Divider,
   Grid,
   Paper,
   Skeleton,
   Typography,
+  useMediaQuery,
   useTheme,
 } from '@mui/material';
 import { useState, useEffect, useCallback } from 'react';
@@ -18,6 +21,7 @@ import { useQuery } from '@tanstack/react-query';
 import apiInstance from '../../api/apiInstance';
 import { MatchData, TeamListData } from '../../types/schedule';
 import CustomScheduleTabPanel from '../../components/CustomScheduleTabPanel';
+import { useRouter } from '../../hooks/useRouter';
 
 const month: Array<string> = [
   '8월',
@@ -33,6 +37,15 @@ const month: Array<string> = [
   '6월',
   '7월',
 ];
+const weekend: { [key: string]: string } = {
+  0: '일',
+  1: '월',
+  2: '화',
+  3: '수',
+  4: '목',
+  5: '금',
+  6: '토',
+};
 const currentDate = new Date();
 
 const year =
@@ -40,9 +53,10 @@ const year =
     ? currentDate.getFullYear() - 1
     : currentDate.getFullYear();
 
-const Schedule = () => {
+const Schedule = ({ isHome }: { isHome?: boolean }) => {
   const theme = useTheme();
-
+  const { routeTo } = useRouter();
+  const isSmallScreen = useMediaQuery(theme.breakpoints.down('md'));
   const [currentTableLeagueName, setCurrentTableLeagueName] =
     useState<string>('PL');
   const [season, setSeason] = useState<string>(year.toString());
@@ -194,6 +208,228 @@ const Schedule = () => {
     return [month, day];
   };
 
+  if (isHome) {
+    const todayDate = currentDate.toLocaleString().slice(0, 12).split('. ')[2];
+    const homeMatchDatas = Object.keys(matchesData)
+      .filter((e) => Number(e.split('.')[1]) >= Number(todayDate))
+      .slice(0, 2);
+    return (
+      <Container
+        sx={{
+          marginY: '32px',
+          maxHeight: '50%',
+        }}
+      >
+        <Box
+          className="table_header"
+          sx={{
+            minHeight: '64px',
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            padding: isSmallScreen ? '16px' : '24px',
+          }}
+        >
+          <Typography
+            variant="h5"
+            sx={{
+              paddingLeft: '12px',
+              fontWeight: 'bold',
+              color: theme.palette.primary.main,
+              alignItems: 'center',
+              display: 'flex',
+            }}
+          >
+            <Typography
+              sx={{
+                fontWeight: 'inherit',
+                fontSize: 'inherit',
+                marginRight: '12px',
+              }}
+            >
+              {isHome ? null : `${season} - ${Number(season) + 1}시즌`}
+            </Typography>
+            해외축구 일정
+          </Typography>
+
+          <Button onClick={() => routeTo('/schedule')}>
+            <Typography sx={{ fontWeight: 'bold' }}>더보기 {'>'}</Typography>
+          </Button>
+        </Box>
+        <Divider />
+        <Box
+          className="table_header_league"
+          sx={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            paddingX: isHome ? '32px' : '128px',
+          }}
+        >
+          {isSmallScreen
+            ? renderLeagueButtons({
+                isHome,
+                currentTableLeagueName,
+                onClick: handleTableHeaderLeaugeClick,
+              }).slice(0, 2)
+            : renderLeagueButtons({
+                isHome,
+                currentTableLeagueName,
+                onClick: handleTableHeaderLeaugeClick,
+              })}
+        </Box>
+        <Divider />
+        <CustomScheduleTabPanel value={currentDate.getMonth()}>
+          <>
+            {homeMatchDatas.map((date: string, idx: number) => {
+              const teamArray: MatchData[] = matchesData[date] as MatchData[];
+              const today: number = new Date(date).getDay();
+
+              return (
+                <Box key={idx} sx={{ marginY: '30px' }}>
+                  <Paper elevation={3}>
+                    <Box
+                      sx={{
+                        backgroundColor: '#f7f9fa',
+                        height: '54px',
+                        alignItems: 'center',
+                        display: 'flex',
+                        padding: '0 20px',
+                      }}
+                    >
+                      <Typography variant="h6" sx={{ fontWeight: 'bold' }}>{`${
+                        dateConverter(date)[0]
+                      }월 ${dateConverter(date)[1]}일 (${
+                        weekend[today]
+                      })`}</Typography>
+                    </Box>
+
+                    {teamScheduleData.isLoading || scheduleData.isLoading ? (
+                      <Skeleton animation="wave" sx={{ minHeight: '62px' }} />
+                    ) : (
+                      teamArray.map((e: MatchData, idx: number) => {
+                        return (
+                          <Grid
+                            container
+                            spacing={2}
+                            key={idx}
+                            sx={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              minHeight: '62px',
+                              padding: '0 20px',
+                              justifyContent: 'space-between',
+                            }}
+                          >
+                            <Grid item>
+                              <Typography
+                                sx={{ fontWeight: 'bold', minWidth: '110px' }}
+                              >
+                                {new Date(e.utcDate).toLocaleString().slice(13)}
+                              </Typography>
+                            </Grid>
+                            <Grid item>
+                              <Box sx={{ display: 'flex' }}>
+                                <Typography
+                                  variant="body2"
+                                  sx={{
+                                    backgroundColor: '#ACACAF',
+                                    color: theme.palette.secondary.main,
+                                    display: 'inline-block',
+                                    alignItems: 'center',
+                                    margin: 'auto',
+                                    borderRadius: '10%',
+                                    marginRight: '12px',
+                                  }}
+                                >
+                                  홈
+                                </Typography>
+                                <Box
+                                  sx={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                  }}
+                                >
+                                  <Typography
+                                    sx={{
+                                      fontWeight: 'bold',
+                                      marginX: '24px',
+                                      minWidth: '150px',
+                                      textAlign: 'center',
+                                    }}
+                                  >
+                                    {e.homeTeam.shortName}{' '}
+                                  </Typography>
+                                  {
+                                    <img
+                                      loading="lazy"
+                                      src={e.homeTeam.crest}
+                                      width={30}
+                                      height={30}
+                                    />
+                                  }{' '}
+                                  <Typography
+                                    sx={{
+                                      fontWeight: 'bold',
+                                      marginX: '24px',
+                                    }}
+                                  >
+                                    {e.score.fullTime.home}
+                                  </Typography>
+                                  <Typography
+                                    sx={{
+                                      fontWeight: 'bold',
+                                      marginX: '24px',
+                                    }}
+                                  >
+                                    {statusConverter(e.status)}{' '}
+                                  </Typography>
+                                  <Typography
+                                    sx={{
+                                      fontWeight: 'bold',
+                                      marginX: '24px',
+                                    }}
+                                  >
+                                    {e.score.fullTime.away}{' '}
+                                  </Typography>
+                                  {
+                                    <img
+                                      loading="lazy"
+                                      src={e.awayTeam.crest}
+                                      width={30}
+                                      height={30}
+                                    />
+                                  }{' '}
+                                  <Typography
+                                    sx={{
+                                      fontWeight: 'bold',
+                                      marginX: '24px',
+                                      minWidth: '150px',
+                                      textAlign: 'center',
+                                    }}
+                                  >
+                                    {e.awayTeam.shortName}
+                                  </Typography>
+                                </Box>
+                              </Box>
+                            </Grid>
+                            <Grid item>
+                              <Typography>{`${e.matchday}R`}</Typography>
+                            </Grid>
+                          </Grid>
+                        );
+                      })
+                    )}
+                  </Paper>
+                </Box>
+              );
+            })}
+          </>
+        </CustomScheduleTabPanel>
+      </Container>
+    );
+  }
+
   return (
     <Container sx={{ marginTop: '32px' }}>
       <Box
@@ -228,15 +464,6 @@ const Schedule = () => {
           {Object.keys(matchesData).map((date: string, idx: number) => {
             const teamArray: MatchData[] = matchesData[date] as MatchData[];
             const today: number = new Date(date).getDay();
-            const weekend: { [key: string]: string } = {
-              0: '일',
-              1: '월',
-              2: '화',
-              3: '수',
-              4: '목',
-              5: '금',
-              6: '토',
-            };
 
             return (
               <Box key={idx} sx={{ marginY: '30px' }}>
