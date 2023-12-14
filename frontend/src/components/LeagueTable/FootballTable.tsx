@@ -7,7 +7,6 @@ import {
   Button,
   Container,
   Divider,
-  Paper,
   Table,
   TableBody,
   TableCell,
@@ -160,7 +159,7 @@ const FootballTable = React.memo(({ tableHeader, isHome }: TableProps) => {
       setEmblem(data.data.emblem);
       isHome
         ? setStandingsData(
-            extractingTeamNames(data.data.standings.slice(0, 10)),
+            extractingTeamNames(data.data.standings.slice(0, 12)),
           )
         : setStandingsData(extractingTeamNames(data.data.standings));
     }
@@ -173,252 +172,236 @@ const FootballTable = React.memo(({ tableHeader, isHome }: TableProps) => {
   return (
     <Container
       sx={{
-        marginY: '32px',
         maxWidth: '2560px',
         width: isXlScreen && !isHome ? '1440px' : null,
       }}
     >
-      <Paper
+      <Box
+        className="table_header"
         sx={{
-          border: isHome ? `1px solid ${theme.palette.primary.main}` : '0',
-          boxShadow: 0,
+          minHeight: '64px',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          padding: isSmallScreen ? '16px' : '24px',
         }}
       >
-        <Box
-          className="table_header"
+        <Typography
+          variant="h5"
           sx={{
-            minHeight: '64px',
-            display: 'flex',
-            justifyContent: 'space-between',
+            paddingLeft: '12px',
+            fontWeight: 'bold',
+            color: theme.palette.primary.main,
             alignItems: 'center',
-            padding: isSmallScreen ? '16px' : '24px',
+            display: 'flex',
           }}
         >
           <Typography
-            variant="h5"
             sx={{
-              paddingLeft: '12px',
-              fontWeight: 'bold',
-              color: theme.palette.primary.main,
-              alignItems: 'center',
-              display: 'flex',
+              fontWeight: 'inherit',
+              fontSize: 'inherit',
+              marginRight: '12px',
             }}
           >
-            <Typography
-              sx={{
-                fontWeight: 'inherit',
-                fontSize: 'inherit',
-                marginRight: '12px',
-              }}
-            >
-              {isHome ? null : `${season} - ${Number(season) + 1}시즌`}
-            </Typography>
-            해외축구 순위표
+            {isHome ? null : `${season} - ${Number(season) + 1}시즌`}
           </Typography>
-          {isHome ? (
-            <Button onClick={() => routeTo('/table')}>
-              <Typography sx={{ fontWeight: 'bold' }}>더보기 {'>'}</Typography>
-            </Button>
-          ) : null}
-          {isHome ? null : <SeasonButton year={year} setSeason={setSeason} />}
-        </Box>
+          해외축구 순위표
+        </Typography>
+        {isHome ? (
+          <Button onClick={() => routeTo('/table')}>
+            <Typography sx={{ fontWeight: 'bold' }}>더보기 {'>'}</Typography>
+          </Button>
+        ) : null}
+        {isHome ? null : <SeasonButton year={year} setSeason={setSeason} />}
+      </Box>
 
-        <Divider />
+      <Divider />
+      <Box
+        className="table_header_league"
+        sx={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          paddingX: isHome ? '32px' : '128px',
+        }}
+      >
+        {isSmallScreen
+          ? renderLeagueButtons({
+              isHome,
+              currentTableLeagueName,
+              onClick: handleTableHeaderLeaugeClick,
+            }).slice(0, 2)
+          : renderLeagueButtons({
+              isHome,
+              currentTableLeagueName,
+              onClick: handleTableHeaderLeaugeClick,
+            })}
+      </Box>
+      {isHome ? null : isLoading ? (
         <Box
-          className="table_header_league"
           sx={{
+            height: '200px',
             display: 'flex',
-            justifyContent: 'space-between',
-            paddingX: isHome ? '32px' : '128px',
+            alignItems: 'center',
+            justifyContent: 'center',
           }}
         >
-          {isSmallScreen
-            ? renderLeagueButtons({
-                isHome,
-                currentTableLeagueName,
-                onClick: handleTableHeaderLeaugeClick,
-              }).slice(0, 2)
-            : renderLeagueButtons({
-                isHome,
-                currentTableLeagueName,
-                onClick: handleTableHeaderLeaugeClick,
-              })}
+          <LoadingCircular />
         </Box>
-        {isHome ? null : isLoading ? (
-          <Box
-            sx={{
-              height: '200px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}
-          >
-            <LoadingCircular />
+      ) : (
+        <>
+          <Divider />
+          <Box sx={{ textAlign: 'center', padding: '1px' }}>
+            <img src={emblem} alt="Emblem" />
           </Box>
-        ) : (
-          <>
-            <Divider />
-            <Box sx={{ textAlign: 'center', padding: '1px' }}>
-              <img src={emblem} alt="Emblem" />
-            </Box>
-          </>
-        )}
-        <Divider />
-        <TableContainer className="home_table_container" sx={{ width: '100%' }}>
-          <Table
-            aria-label="home-table"
-            size={isHome ? 'small' : 'medium'}
-            sx={{ width: '100%' }}
-          >
-            <TableHead sx={{ backgroundColor: '#fbfafa' }}>
-              <TableRow>
-                {tableHeader.map((headerName, idx) => {
-                  return (
+        </>
+      )}
+      <Divider />
+      <TableContainer className="home_table_container" sx={{ width: '100%' }}>
+        <Table
+          aria-label="home-table"
+          size={isHome ? 'small' : 'medium'}
+          sx={{ width: '100%' }}
+        >
+          <TableHead sx={{ backgroundColor: '#fbfafa' }}>
+            <TableRow>
+              {tableHeader.map((headerName, idx) => {
+                return (
+                  <TableCell
+                    sx={{
+                      textAlign: 'center',
+                      padding: '1px',
+                      fontWeight: 'bold',
+                      color: theme.palette.primary.main,
+                    }}
+                    key={idx}
+                  >
+                    {headerName}
+                  </TableCell>
+                );
+              })}
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {!isLoading ? (
+              standingsData.map((e) => {
+                return (
+                  <TableRow
+                    key={e.shortName}
+                    sx={{
+                      '&:last-child td, &:last-child th': {
+                        border: 0,
+                      },
+                    }}
+                  >
                     <TableCell
                       sx={{
                         textAlign: 'center',
-                        padding: '1px',
-                        fontWeight: 'bold',
-                        color: theme.palette.primary.main,
                       }}
-                      key={idx}
                     >
-                      {headerName}
+                      {e.position}
                     </TableCell>
-                  );
-                })}
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {!isLoading ? (
-                standingsData.map((e) => {
-                  return (
-                    <TableRow
-                      key={e.shortName}
+                    <TableCell sx={{ width: isHome ? '48px' : '76px' }}>
+                      <Box sx={{ textAlign: 'center', padding: '1px' }}>
+                        <img
+                          src={e.crest}
+                          style={{ maxWidth: '64px', maxHeight: '100%' }}
+                          width={isHome ? '32px' : '64px'}
+                          height={isHome ? '32px' : '64px'}
+                          alt={e.shortName}
+                          decoding="async"
+                          loading="lazy"
+                        ></img>
+                      </Box>
+                    </TableCell>
+                    <TableCell
                       sx={{
-                        '&:last-child td, &:last-child th': {
-                          border: 0,
-                        },
+                        textAlign: 'center',
+                        maxWidth: isHome ? '100px' : '200px',
+                        width: isHome ? null : '200px',
                       }}
                     >
+                      <Typography
+                        sx={{
+                          color: theme.palette.primary.main,
+                          fontWeight: 'bold',
+                        }}
+                      >
+                        {isHome ? e.tla : e.name}
+                      </Typography>
+                    </TableCell>
+                    <TableCell sx={{ textAlign: 'center', padding: '1px' }}>
+                      {e.playedGames}
+                    </TableCell>
+                    <TableCell sx={{ textAlign: 'center', padding: '1px' }}>
+                      {e.won}
+                    </TableCell>
+                    <TableCell sx={{ textAlign: 'center', padding: '1px' }}>
+                      {e.draw}
+                    </TableCell>
+                    <TableCell sx={{ textAlign: 'center', padding: '1px' }}>
+                      {e.lost}
+                    </TableCell>
+                    {!isHome ? (
+                      <>
+                        <TableCell sx={{ textAlign: 'center', padding: '1px' }}>
+                          {e.goalsFor}
+                        </TableCell>
+                        <TableCell sx={{ textAlign: 'center', padding: '1px' }}>
+                          {e.goalsAgainst}
+                        </TableCell>
+                        <TableCell sx={{ textAlign: 'center', padding: '1px' }}>
+                          {e.goalDifference}
+                        </TableCell>
+                      </>
+                    ) : null}
+                    <TableCell sx={{ textAlign: 'center', padding: '1px' }}>
+                      <Typography
+                        sx={{
+                          color: theme.palette.primary.main,
+                          fontWeight: 'bold',
+                        }}
+                      >
+                        {e.points}
+                      </Typography>
+                    </TableCell>
+                    {!isHome ? (
                       <TableCell
                         sx={{
                           textAlign: 'center',
+                          padding: '1px',
+                          maxWidth: '300px',
+                          width: '300px',
                         }}
                       >
-                        {e.position}
-                      </TableCell>
-                      <TableCell sx={{ width: isHome ? '48px' : '76px' }}>
-                        <Box sx={{ textAlign: 'center', padding: '1px' }}>
-                          <img
-                            src={e.crest}
-                            style={{ maxWidth: '64px', maxHeight: '100%' }}
-                            width={isHome ? '32px' : '64px'}
-                            height={isHome ? '32px' : '64px'}
-                            alt={e.shortName}
-                            decoding="async"
-                            loading="lazy"
-                          ></img>
+                        <Box
+                          sx={{
+                            display: 'flex',
+                            textAlign: 'center',
+                            justifyContent: 'center',
+                          }}
+                        >
+                          {e.form
+                            .split(',')
+                            .map((e, idx) => winDrawLoseColorConverter(e, idx))}
                         </Box>
                       </TableCell>
-                      <TableCell
-                        sx={{
-                          textAlign: 'center',
-                          maxWidth: isHome ? '100px' : '200px',
-                          width: isHome ? null : '200px',
-                        }}
-                      >
-                        <Typography
-                          sx={{
-                            color: theme.palette.primary.main,
-                            fontWeight: 'bold',
-                          }}
-                        >
-                          {isHome ? e.tla : e.name}
-                        </Typography>
-                      </TableCell>
-                      <TableCell sx={{ textAlign: 'center', padding: '1px' }}>
-                        {e.playedGames}
-                      </TableCell>
-                      <TableCell sx={{ textAlign: 'center', padding: '1px' }}>
-                        {e.won}
-                      </TableCell>
-                      <TableCell sx={{ textAlign: 'center', padding: '1px' }}>
-                        {e.draw}
-                      </TableCell>
-                      <TableCell sx={{ textAlign: 'center', padding: '1px' }}>
-                        {e.lost}
-                      </TableCell>
-                      {!isHome ? (
-                        <>
-                          <TableCell
-                            sx={{ textAlign: 'center', padding: '1px' }}
-                          >
-                            {e.goalsFor}
-                          </TableCell>
-                          <TableCell
-                            sx={{ textAlign: 'center', padding: '1px' }}
-                          >
-                            {e.goalsAgainst}
-                          </TableCell>
-                          <TableCell
-                            sx={{ textAlign: 'center', padding: '1px' }}
-                          >
-                            {e.goalDifference}
-                          </TableCell>
-                        </>
-                      ) : null}
-                      <TableCell sx={{ textAlign: 'center', padding: '1px' }}>
-                        <Typography
-                          sx={{
-                            color: theme.palette.primary.main,
-                            fontWeight: 'bold',
-                          }}
-                        >
-                          {e.points}
-                        </Typography>
-                      </TableCell>
-                      {!isHome ? (
-                        <TableCell
-                          sx={{
-                            textAlign: 'center',
-                            padding: '1px',
-                            maxWidth: '300px',
-                            width: '300px',
-                          }}
-                        >
-                          <Box
-                            sx={{
-                              display: 'flex',
-                              textAlign: 'center',
-                              justifyContent: 'center',
-                            }}
-                          >
-                            {e.form
-                              .split(',')
-                              .map((e, idx) =>
-                                winDrawLoseColorConverter(e, idx),
-                              )}
-                          </Box>
-                        </TableCell>
-                      ) : null}
-                    </TableRow>
-                  );
-                })
-              ) : (
-                <TableRow>
-                  <TableCell
-                    colSpan={tableHeader.length}
-                    sx={{ textAlign: 'center', height: '480px' }}
-                  >
-                    <LoadingCircular />
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
-        </TableContainer>
-      </Paper>
+                    ) : null}
+                  </TableRow>
+                );
+              })
+            ) : (
+              <TableRow>
+                <TableCell
+                  colSpan={tableHeader.length}
+                  sx={{ textAlign: 'center', height: '480px' }}
+                >
+                  <LoadingCircular />
+                </TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
+      </TableContainer>
     </Container>
   );
 });
