@@ -21,32 +21,25 @@ const Footer = () => {
       <Container>
         <Grid container spacing={2}>
           <Grid item xs={12} md={4}>
-            <Typography variant="h6">About Us</Typography>
-            <Typography variant="body2">
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-            </Typography>
+            <Typography variant="h6">About Page</Typography>
+            <Typography variant="body2">해외 축구 일정 및 테이블</Typography>
+            <Typography variant="body2">커뮤니티</Typography>
           </Grid>
           <Grid item xs={12} md={4}>
-            <Typography variant="h6">Follow Us</Typography>
+            <Typography variant="h6">API By</Typography>
             <div>
-              <Link href="#" color="inherit" sx={{ marginRight: 1 }}>
-                f
-              </Link>
-              <Link href="#" color="inherit" sx={{ marginRight: 1 }}>
-                t
-              </Link>
-              <Link href="#" color="inherit" sx={{ marginRight: 1 }}>
-                i
-              </Link>
-              <Link href="#" color="inherit">
-                y
+              <Link
+                href="https://www.football-data.org/"
+                color="inherit"
+                sx={{ marginRight: 1 }}
+              >
+                https://www.football-data.org/
               </Link>
             </div>
           </Grid>
           <Grid item xs={12} md={4}>
-            <Typography variant="h6">Contact Us</Typography>
-            <Typography variant="body2">Email: contact@example.com</Typography>
-            <Typography variant="body2">Phone: +1 234 567 890</Typography>
+            <Typography variant="h6">Made By LeeKee0905</Typography>
+            <Typography variant="body2">Email: cj8928@gmail.com</Typography>
           </Grid>
         </Grid>
       </Container>
