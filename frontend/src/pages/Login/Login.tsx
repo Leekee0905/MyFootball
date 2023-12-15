@@ -4,7 +4,7 @@ import {
   ButtonGroup,
   Container,
   FormControl,
-  InputLabel,
+  InputAdornment,
   TextField,
   Typography,
   useTheme,
@@ -12,21 +12,12 @@ import {
 import { Controller, useForm } from 'react-hook-form';
 import { LoginData } from '../../types/login';
 import { useRouter } from '../../hooks/useRouter';
-import { useEffect } from 'react';
-
-const MIN_PASSWORD_LENGTH = 13;
+import { Lock, Person } from '@mui/icons-material';
 
 const Login = () => {
   const theme = useTheme();
   const { routeTo } = useRouter();
-  const {
-    getValues,
-    setValue,
-    control,
-    setError,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<LoginData>({
+  const { control, handleSubmit } = useForm<LoginData>({
     defaultValues: {
       id: '',
       password: '',
@@ -34,21 +25,9 @@ const Login = () => {
   });
 
   const onSubmit = handleSubmit((data) => {
-    console.log('Form Data:', data);
+    console.log(data);
   });
-  const validatePassword = (password: string) => {
-    // 비밀번호 유효성 검사 규칙을 적용
-    if (password.length < MIN_PASSWORD_LENGTH) {
-      return `비밀번호는 최소 ${MIN_PASSWORD_LENGTH}자 이상이어야 합니다.`;
-    }
 
-    // 다른 유효성 검사 규칙을 추가할 수 있습니다.
-
-    return undefined;
-  };
-  useEffect(() => {
-    console.log(errors);
-  }, [errors]);
   return (
     <Container sx={{ marginY: '10%', textAlign: 'center' }}>
       <Typography
@@ -66,8 +45,8 @@ const Login = () => {
           marginY: '24px',
           border: '1px solid rgba(0, 0, 0, 0.23)',
           borderRadius: '10px',
-          maxWidth: '500px',
-          minHeight: '250px',
+          maxWidth: '600px',
+          minHeight: '300px',
         }}
       >
         <form onSubmit={onSubmit}>
@@ -76,16 +55,28 @@ const Login = () => {
               <Controller
                 name="id"
                 control={control}
-                rules={{ required: true }}
-                render={({ field, fieldState }) => (
-                  <TextField
-                    {...field}
-                    variant="outlined"
-                    placeholder="아이디"
-                    error={!!fieldState.error}
-                    helperText={fieldState.error?.message}
-                  />
-                )}
+                rules={{
+                  required: '아이디를 입력하세요.',
+                  minLength: 1,
+                }}
+                render={({ field, fieldState }) => {
+                  return (
+                    <TextField
+                      {...field}
+                      variant="outlined"
+                      InputProps={{
+                        startAdornment: (
+                          <InputAdornment position="start">
+                            <Person />
+                          </InputAdornment>
+                        ),
+                      }}
+                      placeholder="아이디"
+                      error={!!fieldState.error}
+                      helperText={fieldState.error?.message}
+                    />
+                  );
+                }}
               />
             </FormControl>
             <FormControl fullWidth>
@@ -93,19 +84,27 @@ const Login = () => {
                 name="password"
                 control={control}
                 rules={{
-                  required: true,
-                  validate: (value) => validatePassword(value),
+                  required: '비밀번호를 입력하세요.',
                 }}
-                render={({ field, fieldState }) => (
-                  <TextField
-                    {...field}
-                    variant="outlined"
-                    type="password"
-                    placeholder="비밀번호"
-                    error={!!fieldState.error}
-                    helperText={fieldState.error?.message}
-                  />
-                )}
+                render={({ field, fieldState: { error } }) => {
+                  return (
+                    <TextField
+                      {...field}
+                      variant="outlined"
+                      type="password"
+                      InputProps={{
+                        startAdornment: (
+                          <InputAdornment position="start">
+                            <Lock />
+                          </InputAdornment>
+                        ),
+                      }}
+                      placeholder="비밀번호"
+                      error={!!error}
+                      helperText={error?.message}
+                    />
+                  );
+                }}
               />
             </FormControl>
           </Box>
