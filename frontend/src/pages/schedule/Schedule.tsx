@@ -463,7 +463,9 @@ const Schedule = ({ isHome }: { isHome?: boolean }) => {
         <>
           {Object.keys(matchesData).map((date: string, idx: number) => {
             const teamArray: MatchData[] = matchesData[date] as MatchData[];
-            const today: number = new Date(date).getDay();
+            const today: number = teamArray.map((e) =>
+              new Date(e.utcDate).getDay(),
+            )[0];
 
             return (
               <Box key={idx} sx={{ marginY: '30px' }}>
