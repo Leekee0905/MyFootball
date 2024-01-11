@@ -7,6 +7,7 @@ import FreeBoard from './pages/freeboard/FreeBoard';
 import Schedule from './pages/schedule/Schedule';
 import Table from './pages/table/Table';
 import Signup from './pages/signup/Signup';
+import Write from './pages/freeboard/Write';
 
 interface RouterElement {
   id: number;
@@ -57,6 +58,13 @@ const routerData: RouterElement[] = [
     path: '/signup',
     label: 'Signup',
     element: <Signup />,
+    withAuth: false,
+  },
+  {
+    id: 6,
+    path: '/write',
+    label: 'Write',
+    element: <Write />,
     withAuth: false,
   },
 ];
