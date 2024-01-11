@@ -1,6 +1,7 @@
 import { Box, Grid, useTheme } from '@mui/material';
 import FootballTable from '../../components/LeagueTable/FootballTable';
 import Schedule from '../schedule/Schedule';
+import FreeBoard from '../freeboard/FreeBoard';
 
 const tableHeader: Array<string> = [
   '순위',
@@ -38,7 +39,15 @@ const Home = () => {
           >
             <Schedule isHome={true} />
           </Box>
-          <>FreeBoard예정</>
+          <Box
+            sx={{
+              overflow: 'auto',
+              height: '400px',
+              border: `1px solid ${theme.palette.primary.main}`,
+            }}
+          >
+            <FreeBoard isHome={true} />
+          </Box>
         </Grid>
       </Grid>
     </>
