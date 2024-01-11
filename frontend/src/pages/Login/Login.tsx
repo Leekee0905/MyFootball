@@ -13,6 +13,7 @@ import { Controller, useForm } from 'react-hook-form';
 import { LoginData } from '../../types/login';
 import { useRouter } from '../../hooks/useRouter';
 import { Lock, Person } from '@mui/icons-material';
+import apiInstance from '../../api/apiInstance';
 
 const Login = () => {
   const theme = useTheme();
@@ -24,8 +25,20 @@ const Login = () => {
     },
   });
 
+  const handleLogin = async (data: LoginData) => {
+    try {
+      const response = await apiInstance.post('/auth/login', data);
+      if (response.data.status === 'success') {
+        routeTo('/');
+      }
+      console.log(response.data);
+    } catch (error: any) {
+      console.error('error', error);
+      alert(`${error.response.data.message}`);
+    }
+  };
   const onSubmit = handleSubmit((data) => {
-    console.log(data);
+    handleLogin(data);
   });
 
   return (
