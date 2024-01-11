@@ -92,7 +92,6 @@ export class ScheduleService {
     dateTo: string,
   ): Record<string, any[]> {
     const groupedMatches: Record<string, any[]> = {};
-    const month = Number(dateTo.split('-')[1]);
 
     matches.forEach((match) => {
       let dateKey = new Date(match.utcDate)
