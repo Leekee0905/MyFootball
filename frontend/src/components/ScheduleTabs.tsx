@@ -16,6 +16,7 @@ interface ScheduleTabs {
 
 const ScheduleTabs = React.memo(
   ({ elements, today, setSelectedId }: ScheduleTabs) => {
+    //8월 시작 => 인덱스 0부터 시작
     const [value, setValue] = useState<number>(
       today !== undefined ? (today < 8 ? today + 4 : today - 8) : 0,
     );
