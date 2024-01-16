@@ -22,6 +22,7 @@ import apiInstance from '../../api/apiInstance';
 import { MatchData, TeamListData } from '../../types/schedule';
 import CustomScheduleTabPanel from '../../components/CustomScheduleTabPanel';
 import { useRouter } from '../../hooks/useRouter';
+import { usePreloadImage } from '../../hooks/usePreloadImage';
 
 const month: Array<string> = [
   '8월',
@@ -56,6 +57,7 @@ const year =
 const Schedule = ({ isHome }: { isHome?: boolean }) => {
   const theme = useTheme();
   const { routeTo } = useRouter();
+  const { preLoadImage } = usePreloadImage();
   const isSmallScreen = useMediaQuery(theme.breakpoints.down('md'));
   const [currentTableLeagueName, setCurrentTableLeagueName] =
     useState<string>('PL');
@@ -80,11 +82,6 @@ const Schedule = ({ isHome }: { isHome?: boolean }) => {
     .toLocaleString()
     .split('.')[2]
     .trim();
-
-  const preLoadImage = (url: string) => {
-    const img = new Image();
-    img.src = url;
-  };
 
   const scheduleData = useQuery({
     queryKey: ['schedule', currentTableLeagueName, season, selectedMonth],
@@ -140,6 +137,9 @@ const Schedule = ({ isHome }: { isHome?: boolean }) => {
   });
 
   useEffect(() => {
+    if (scheduleData.isError || teamListData.isError) {
+      routeTo('/error');
+    }
     if (scheduleData.isSuccess) {
       Object.values(scheduleData.data.data as MatchData[][]).map(
         (e: MatchData[]) =>
@@ -212,11 +212,11 @@ const Schedule = ({ isHome }: { isHome?: boolean }) => {
     const todayDate = currentDate.toLocaleString().slice(0, 12).split('. ')[2];
     const homeMatchDatas = Object.keys(matchesData)
       .filter((e) => Number(e.split('.')[1]) >= Number(todayDate))
-      .slice(0, 2);
+      .slice(0, 3);
+
     return (
       <Container
         sx={{
-          marginY: '32px',
           maxHeight: '50%',
         }}
       >

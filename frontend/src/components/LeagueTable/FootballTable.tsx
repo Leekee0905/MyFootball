@@ -21,6 +21,7 @@ import { useRouter } from '../../hooks/useRouter';
 import LoadingCircular from '../LoadingCircular';
 import SeasonButton from './SeasonButton';
 import { league, renderLeagueButtons } from '../RenderLeagueButton';
+import { usePreloadImage } from '../../hooks/usePreloadImage';
 interface StandingDataType {
   crest: string;
   draw: number;
@@ -77,6 +78,8 @@ const year =
 
 const FootballTable = React.memo(({ tableHeader, isHome }: TableProps) => {
   const theme = useTheme();
+  const { preLoadImage } = usePreloadImage();
+
   const isSmallScreen = useMediaQuery(theme.breakpoints.down('md'));
   const isXlScreen = useMediaQuery(theme.breakpoints.up('xl'));
   const { routeTo } = useRouter();
@@ -89,7 +92,8 @@ const FootballTable = React.memo(({ tableHeader, isHome }: TableProps) => {
 
   const [currentTableLeagueName, setCurrentTableLeagueName] =
     useState<string>('PL');
-  const { data, isLoading, isSuccess, refetch } = useQuery({
+
+  const { data, isLoading, isSuccess, refetch, isError } = useQuery({
     queryKey: ['table', currentTableLeagueName, season],
     queryFn: () =>
       apiInstance.get(`/table/${currentTableLeagueName}/standings`, {
@@ -100,11 +104,6 @@ const FootballTable = React.memo(({ tableHeader, isHome }: TableProps) => {
     staleTime: Infinity,
     enabled: true,
   });
-
-  const preLoadImage = (url: string) => {
-    const img = new Image();
-    img.src = url;
-  };
 
   const winDrawLoseColorConverter = useMemo(
     () => (result: string, key: number) => {
@@ -154,6 +153,9 @@ const FootballTable = React.memo(({ tableHeader, isHome }: TableProps) => {
   }, []);
 
   useEffect(() => {
+    if (isError) {
+      routeTo(`/error`);
+    }
     if (isSuccess) {
       preLoadImage(data.data.emblem);
       setEmblem(data.data.emblem);
