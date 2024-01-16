@@ -87,10 +87,7 @@ export class ScheduleService {
     };
   }
 
-  private groupMatchesByDate(
-    matches: MatchData[],
-    dateTo: string,
-  ): Record<string, any[]> {
+  private groupMatchesByDate(matches: MatchData[]): Record<string, any[]> {
     const groupedMatches: Record<string, any[]> = {};
 
     matches.forEach((match) => {
@@ -108,18 +105,7 @@ export class ScheduleService {
         groupedMatches[dateKey] = [];
       }
       groupedMatches[dateKey].push(this.extractMatchFields(match));
-      // if (Number(dateKey.split('.')[0]) === month) {
-      //   if (!groupedMatches[dateKey]) {
-      //     groupedMatches[dateKey] = [];
-      //   }
-
-      // } else {
-      //   this.newMonthObject = {
-      //     [dateKey]: [this.extractMatchFields(match)],
-      //   };
-      // }
     });
-    //나중에 데이터베이스 연동 후에 전체일정 저장후 로컬라이징후 다시 가져오기
 
     return groupedMatches;
   }
@@ -144,7 +130,7 @@ export class ScheduleService {
 
       const matchesData: MatchData[] = response.data.matches;
 
-      const groupedData = this.groupMatchesByDate(matchesData, dateTo);
+      const groupedData = this.groupMatchesByDate(matchesData);
 
       return groupedData;
     } catch (error) {
@@ -210,7 +196,7 @@ export class ScheduleService {
       });
       const matchesData: MatchData[] = response.data.matches;
 
-      const groupedData = this.groupMatchesByDate(matchesData, dateTo);
+      const groupedData = this.groupMatchesByDate(matchesData);
 
       return groupedData;
     } catch (error) {
