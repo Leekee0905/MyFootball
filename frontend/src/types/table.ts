@@ -28,3 +28,25 @@ export interface TableType {
   season: string;
   standings: SeasonTable[];
 }
+export interface StandingDataType {
+  crest: string;
+  draw: number;
+  form: string;
+  goalDifference: number;
+  goalsAgainst: number;
+  goalsFor: number;
+  id: number;
+  lost: number;
+  name: string;
+  playedGames: number;
+  points: number;
+  position: number;
+  shortName: string;
+  tla: string;
+  won: number;
+}
+
+export interface TableProps {
+  tableHeader: Array<string>;
+  isHome: boolean;
+}

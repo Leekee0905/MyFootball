@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import apiInstance from '../../api/apiInstance';
 import { useQuery } from '@tanstack/react-query';
-import { SeasonTable } from '../../types/table';
+import { SeasonTable, StandingDataType, TableProps } from '../../types/table';
 import {
   Box,
   Button,
@@ -25,28 +25,6 @@ import { usePreloadImage } from '../../hooks/usePreloadImage';
 import Error429Alert from '../Error429Alert';
 import { useRecoilState } from 'recoil';
 import { AlertAtom } from '../../atoms/alert';
-interface StandingDataType {
-  crest: string;
-  draw: number;
-  form: string;
-  goalDifference: number;
-  goalsAgainst: number;
-  goalsFor: number;
-  id: number;
-  lost: number;
-  name: string;
-  playedGames: number;
-  points: number;
-  position: number;
-  shortName: string;
-  tla: string;
-  won: number;
-}
-
-interface TableProps {
-  tableHeader: Array<string>;
-  isHome: boolean;
-}
 
 const initialStandingTableData: StandingDataType[] = [
   {
@@ -82,7 +60,6 @@ const year =
 const FootballTable = React.memo(({ tableHeader, isHome }: TableProps) => {
   const theme = useTheme();
   const { preLoadImage } = usePreloadImage();
-
   const isSmallScreen = useMediaQuery(theme.breakpoints.down('md'));
   const isXlScreen = useMediaQuery(theme.breakpoints.up('xl'));
   const { routeTo } = useRouter();
