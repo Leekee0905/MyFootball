@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import axios from 'axios';
 
 interface MatchData {
@@ -134,6 +134,12 @@ export class ScheduleService {
 
       return groupedData;
     } catch (error) {
+      if (error.response && error.response.status === 429) {
+        throw new HttpException(
+          'API 요청 제한 초과. 나중에 다시 시도하세요.',
+          HttpStatus.TOO_MANY_REQUESTS,
+        );
+      }
       throw error;
     }
   }
@@ -167,6 +173,12 @@ export class ScheduleService {
       });
       return teams;
     } catch (error) {
+      if (error.response && error.response.status === 429) {
+        throw new HttpException(
+          'API 요청 제한 초과. 나중에 다시 시도하세요.',
+          HttpStatus.TOO_MANY_REQUESTS,
+        );
+      }
       throw error;
     }
   }
@@ -200,6 +212,12 @@ export class ScheduleService {
 
       return groupedData;
     } catch (error) {
+      if (error.response && error.response.status === 429) {
+        throw new HttpException(
+          'API 요청 제한 초과. 나중에 다시 시도하세요.',
+          HttpStatus.TOO_MANY_REQUESTS,
+        );
+      }
       throw error;
     }
   }
