@@ -12,7 +12,7 @@ const Error404 = () => {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        flexDirection: 'column', // 컨테이너의 자식 요소들을 세로로 정렬
+        flexDirection: 'column',
       }}
     >
       <Box
