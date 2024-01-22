@@ -13,7 +13,7 @@ https://www.football-data.org
 React + NestJS
 CSS Material ui
 
-API Control : Tanstack-Query
+API Control : Tanstack-Query,
 ErrorAlertState: Recoil
 
 ## 홈
