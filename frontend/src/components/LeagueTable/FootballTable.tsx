@@ -22,6 +22,9 @@ import LoadingCircular from '../LoadingCircular';
 import SeasonButton from './SeasonButton';
 import { league, renderLeagueButtons } from '../RenderLeagueButton';
 import { usePreloadImage } from '../../hooks/usePreloadImage';
+import Error429Alert from '../Error429Alert';
+import { useRecoilState } from 'recoil';
+import { AlertAtom } from '../../atoms/alert';
 interface StandingDataType {
   crest: string;
   draw: number;
@@ -89,18 +92,25 @@ const FootballTable = React.memo(({ tableHeader, isHome }: TableProps) => {
   const [emblem, setEmblem] = useState<string>('');
 
   const [season, setSeason] = useState<string>(year.toString());
-
+  const [openAlert, setOpenAlert] = useRecoilState<boolean>(AlertAtom);
   const [currentTableLeagueName, setCurrentTableLeagueName] =
     useState<string>('PL');
 
   const { data, isLoading, isSuccess, refetch, isError } = useQuery({
     queryKey: ['table', currentTableLeagueName, season],
     queryFn: () =>
-      apiInstance.get(`/table/${currentTableLeagueName}/standings`, {
-        params: {
-          season: season,
-        },
-      }),
+      apiInstance
+        .get(`/table/${currentTableLeagueName}/standings`, {
+          params: {
+            season: season,
+          },
+        })
+        .catch((error) => {
+          if (error.response.status === 429) {
+            setOpenAlert(true);
+          }
+          throw error;
+        }),
     staleTime: Infinity,
     enabled: true,
   });
@@ -153,9 +163,6 @@ const FootballTable = React.memo(({ tableHeader, isHome }: TableProps) => {
   }, []);
 
   useEffect(() => {
-    if (isError) {
-      routeTo(`/error`);
-    }
     if (isSuccess) {
       preLoadImage(data.data.emblem);
       setEmblem(data.data.emblem);
@@ -171,6 +178,12 @@ const FootballTable = React.memo(({ tableHeader, isHome }: TableProps) => {
     refetch();
   }, [season]);
 
+  useEffect(() => {
+    if (!isError) {
+      setOpenAlert(false);
+    }
+  }, [isError]);
+
   return (
     <Container
       sx={{
@@ -178,6 +191,7 @@ const FootballTable = React.memo(({ tableHeader, isHome }: TableProps) => {
         width: isXlScreen && !isHome ? '1440px' : null,
       }}
     >
+      {openAlert ? <Error429Alert /> : null}
       <Box
         className="table_header"
         sx={{

@@ -23,6 +23,9 @@ import { MatchData, TeamListData } from '../../types/schedule';
 import CustomScheduleTabPanel from '../../components/CustomScheduleTabPanel';
 import { useRouter } from '../../hooks/useRouter';
 import { usePreloadImage } from '../../hooks/usePreloadImage';
+import { useRecoilState } from 'recoil';
+import { AlertAtom } from '../../atoms/alert';
+import Error429Alert from '../../components/Error429Alert';
 
 const month: Array<string> = [
   '8월',
@@ -58,6 +61,7 @@ const Schedule = ({ isHome }: { isHome?: boolean }) => {
   const theme = useTheme();
   const { routeTo } = useRouter();
   const { preLoadImage } = usePreloadImage();
+  const [openAlert, setOpenAlert] = useRecoilState<boolean>(AlertAtom);
   const isSmallScreen = useMediaQuery(theme.breakpoints.down('md'));
   const [currentTableLeagueName, setCurrentTableLeagueName] =
     useState<string>('PL');
@@ -86,15 +90,24 @@ const Schedule = ({ isHome }: { isHome?: boolean }) => {
   const scheduleData = useQuery({
     queryKey: ['schedule', currentTableLeagueName, season, selectedMonth],
     queryFn: () =>
-      apiInstance.get(`/schedule/${currentTableLeagueName}/matches`, {
-        params: {
-          season: season,
-          dateFrom: `${currentYear}-${monthLengthConverter(selectedMonth)}-01`,
-          dateTo: `${currentYear}-${monthLengthConverter(
-            selectedMonth,
-          )}-${lastDateOfMonth}`,
-        },
-      }),
+      apiInstance
+        .get(`/schedule/${currentTableLeagueName}/matches`, {
+          params: {
+            season: season,
+            dateFrom: `${currentYear}-${monthLengthConverter(
+              selectedMonth,
+            )}-01`,
+            dateTo: `${currentYear}-${monthLengthConverter(
+              selectedMonth,
+            )}-${lastDateOfMonth}`,
+          },
+        })
+        .catch((error) => {
+          if (error.response.status === 429) {
+            setOpenAlert(true);
+          }
+          throw error;
+        }),
     staleTime: Infinity,
     enabled: selectedTeamId === 0,
   });
@@ -109,16 +122,25 @@ const Schedule = ({ isHome }: { isHome?: boolean }) => {
       competitonId,
     ],
     queryFn: () =>
-      apiInstance.get(`/schedule/${selectedTeamId}/teams/matches`, {
-        params: {
-          season: season,
-          dateFrom: `${currentYear}-${monthLengthConverter(selectedMonth)}-01`,
-          dateTo: `${currentYear}-${monthLengthConverter(
-            selectedMonth,
-          )}-${lastDateOfMonth}`,
-          competitions: competitonId,
-        },
-      }),
+      apiInstance
+        .get(`/schedule/${selectedTeamId}/teams/matches`, {
+          params: {
+            season: season,
+            dateFrom: `${currentYear}-${monthLengthConverter(
+              selectedMonth,
+            )}-01`,
+            dateTo: `${currentYear}-${monthLengthConverter(
+              selectedMonth,
+            )}-${lastDateOfMonth}`,
+            competitions: competitonId,
+          },
+        })
+        .catch((error) => {
+          if (error.response.status === 429) {
+            setOpenAlert(true);
+          }
+          throw error;
+        }),
     staleTime: Infinity,
     enabled: selectedTeamId !== 0,
     retryDelay: 1000,
@@ -137,9 +159,10 @@ const Schedule = ({ isHome }: { isHome?: boolean }) => {
   });
 
   useEffect(() => {
-    if (scheduleData.isError || teamListData.isError) {
-      routeTo('/error');
+    if (!scheduleData.isError || !teamScheduleData.isError) {
+      setOpenAlert(false);
     }
+
     if (scheduleData.isSuccess) {
       Object.values(scheduleData.data.data as MatchData[][]).map(
         (e: MatchData[]) =>
@@ -324,7 +347,10 @@ const Schedule = ({ isHome }: { isHome?: boolean }) => {
                               <Typography
                                 sx={{ fontWeight: 'bold', minWidth: '110px' }}
                               >
-                                {new Date(e.utcDate).toLocaleString().slice(13)}
+                                {new Date(e.utcDate)
+                                  .toLocaleString()
+                                  .slice(12)
+                                  .trim()}
                               </Typography>
                             </Grid>
                             <Grid item>
@@ -432,6 +458,11 @@ const Schedule = ({ isHome }: { isHome?: boolean }) => {
 
   return (
     <Container sx={{ marginTop: '32px' }}>
+      {openAlert ? (
+        <Box className="errorAlert" sx={{ marginBottom: '32px' }}>
+          <Error429Alert />
+        </Box>
+      ) : null}
       <Box
         sx={{
           textAlign: 'center',
@@ -507,7 +538,10 @@ const Schedule = ({ isHome }: { isHome?: boolean }) => {
                             <Typography
                               sx={{ fontWeight: 'bold', minWidth: '110px' }}
                             >
-                              {new Date(e.utcDate).toLocaleString().slice(13)}
+                              {new Date(e.utcDate)
+                                .toLocaleString()
+                                .slice(12)
+                                .trim()}
                             </Typography>
                           </Grid>
                           <Grid item>
