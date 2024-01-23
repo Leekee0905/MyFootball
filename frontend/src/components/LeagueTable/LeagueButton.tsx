@@ -1,5 +1,4 @@
 // LeagueButton.tsx
-import React from 'react';
 import { Button, Typography, useTheme } from '@mui/material';
 
 interface LeagueButtonProps {

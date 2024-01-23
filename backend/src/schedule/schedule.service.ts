@@ -54,7 +54,6 @@ export class ScheduleService {
   private readonly apiUrl = 'https://api.football-data.org/v4/competitions';
   private readonly teamMatchUrl = 'https://api.football-data.org/v4/teams';
   private readonly apiKey = process.env.FOOTBALL_API_KEY;
-  private newMonthObject: Record<string, any[]> = {};
   private extractMatchFields(match: MatchData): any {
     const {
       id,
@@ -91,16 +90,22 @@ export class ScheduleService {
     const groupedMatches: Record<string, any[]> = {};
 
     matches.forEach((match) => {
-      let dateKey = new Date(match.utcDate)
-        .toLocaleDateString()
-        .slice(5, 12)
-        .split('')
-        .map((e) => e.trim())
-        .join('');
+      //주석은 윈도우에서
+      // let dateKey = new Date(match.utcDate)
+      //   .toLocaleDateString()
+      //   .slice(5, 12)
+      //   .split('')
+      //   .map((e) => e.trim())
+      //   .join('');
 
-      if (dateKey.at(-1) === '.') {
-        dateKey = dateKey.slice(0, -1);
-      }
+      // if (dateKey.at(-1) === '.') {
+      //   dateKey = dateKey.slice(0, -1);
+      // }
+      const dateKey = new Date(match.utcDate)
+        .toLocaleDateString()
+        .split('/')
+        .slice(0, 2)
+        .join('.');
       if (!groupedMatches[dateKey]) {
         groupedMatches[dateKey] = [];
       }

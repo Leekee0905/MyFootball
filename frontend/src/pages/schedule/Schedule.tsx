@@ -103,7 +103,10 @@ const Schedule = ({ isHome }: { isHome?: boolean }) => {
           },
         })
         .catch((error) => {
-          if (error.response.status === 429) {
+          if (
+            error.response.status === 429 ||
+            error.response.statusCode === 429
+          ) {
             setOpenAlert(true);
           }
           throw error;

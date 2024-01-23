@@ -23,6 +23,7 @@ const ScheduleTabs = React.memo(
 
     const handleChange = (e: React.SyntheticEvent, newValue: number) => {
       setValue(newValue);
+      console.log(e);
       if (setSelectedId && typeof setSelectedId === 'function') {
         const selectedElement = elements[newValue];
         if (typeof selectedElement !== 'string') {
