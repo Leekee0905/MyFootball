@@ -2,7 +2,7 @@
 
 ## 해외 축구 일정 및 순위 확인
 
-https://myfootball.vercel.app
+폐쇄 ~~https://myfootball.vercel.app~~
 
 EPL과 네이버 해외축구 페이지의 UI를 참고하여 만든 해외 축구 리그 일정 및 순위표 보기 웹페이지입니다.
 
